@@ -37,8 +37,9 @@ public class MainActivity extends Activity {
                 break;
         }
 
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://maps.google.com/maps?daddr="+latlang));
+        Intent intent = new Intent();
+        intent.putExtra("url","https://maps.googleapis.com/maps/api/directions/json?destination="+latlang);
+        intent.setClass(this, PathDisplayActivity.class);
         startActivity(intent);
     }
 }
