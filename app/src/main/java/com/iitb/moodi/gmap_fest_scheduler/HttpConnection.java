@@ -1,5 +1,7 @@
 package com.iitb.moodi.gmap_fest_scheduler;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,8 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.util.Log;
 
 import au.com.bytecode.opencsv.CSVReader;
 

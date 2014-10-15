@@ -1,29 +1,28 @@
 package com.iitb.moodi.gmap_fest_scheduler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.json.JSONObject;
-
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class PathDisplayActivity extends FragmentActivity {
 
     private static final LatLng IITB = new LatLng(19.133484, 72.914324);
+    LatLng myLocation, destination;
 
     GoogleMap googleMap;
     final String TAG = "PathGoogleMapActivity";
@@ -35,13 +34,23 @@ public class PathDisplayActivity extends FragmentActivity {
         SupportMapFragment fm = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         googleMap = fm.getMap();
+        googleMap.setMyLocationEnabled(true);
 
-        String url = getIntent().getStringExtra("url");
+        myLocation = getIntent().getParcelableExtra("myLocation");
+        destination = getIntent().getParcelableExtra("destination");
+
+        String url = getGoogleMapsURL();
+        Log.d(TAG,url);
         ReadTask downloadTask = new ReadTask();
         downloadTask.execute(url);
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(IITB,15));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation,15));
+    }
 
+    public String getGoogleMapsURL() {
+        return "https://maps.googleapis.com/maps/api/directions/json?" +
+                "origin="+myLocation.latitude+","+myLocation.longitude+
+                "&destination="+destination.latitude+","+destination.longitude;
     }
 
     private class ReadTask extends AsyncTask<String, Void, String> {
