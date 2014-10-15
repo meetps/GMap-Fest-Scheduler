@@ -51,6 +51,8 @@ public class HttpConnection {
             URL url = new URL(csvUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.connect();
+
+            Log.d("Download Debug","response: " + urlConnection.getResponseCode()+" -> "+urlConnection.getResponseMessage());
             iStream = urlConnection.getInputStream();
             CSVReader csv = new CSVReader(new InputStreamReader(
                     iStream));
@@ -59,9 +61,11 @@ public class HttpConnection {
 
             while ((next = csv.readNext()) != null) {
                 data.add(next);
+                Log.i("Download Debug","row recieved : "+next[0]);
             }
+            Log.i("Download Debug","data size : "+data.size());
         } catch (Exception e) {
-            Log.d("Exception while reading url", e.getMessage());
+            Log.d("Exception while reading url", e.toString());
         } finally {
             iStream.close();
             urlConnection.disconnect();

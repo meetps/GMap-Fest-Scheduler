@@ -2,17 +2,16 @@ package com.iitb.moodi.gmap_fest_scheduler;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -28,7 +27,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new ReadTask().doInBackground("https://drive.google.com/uc?export=download&id=0B_6rvZNWXShpV0t0ZWxlNkQ5UE0");
+        new ReadTask().execute("http://auv-iitb.org/Web/fonts/mi_events.csv");
     }
 
     public void onClick(View v){
@@ -36,7 +35,7 @@ public class MainActivity extends Activity {
         String latlang=getLatLang(data.get(radioButtonID)[4]);
 
         Intent intent = new Intent();
-        intent.putExtra("url","https://maps.googleapis.com/maps/api/directions/json?origin=19.137559,72.914470destination="+latlang);
+        intent.putExtra("url","https://maps.googleapis.com/maps/api/directions/json?origin=19.137559,72.914470&destination="+latlang);
         intent.setClass(this, PathDisplayActivity.class);
         startActivity(intent);
     }
@@ -75,11 +74,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            if(progress[0]%10!=0) return;
-
-            Toast t = new Toast(getApplicationContext());
-            t.setText("Downloaded "+ progress[0]+"%");
-            t.setDuration(Toast.LENGTH_SHORT);
+            Log.d("Download Debug","progress:"+progress);
         }
 
         @Override
@@ -87,6 +82,7 @@ public class MainActivity extends Activity {
             super.onPostExecute(result);
             data=result;
             populateList();
+            Log.d("Download Debug","finished executing");
         }
     }
 
