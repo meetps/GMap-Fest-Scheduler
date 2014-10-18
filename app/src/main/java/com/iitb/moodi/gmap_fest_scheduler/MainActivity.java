@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
 // Register the listener with the Location Manager to receive location updates
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
-        new ReadTask().execute("http://auv-iitb.org/Web/fonts/mi_events.csv");
+        new ReadTask().execute("https://drive.google.com/uc?execute=download&id=0B_6rvZNWXShpV0t0ZWxlNkQ5UE0");
     }
 
     public void onClick(View v){
@@ -96,6 +96,7 @@ public class MainActivity extends Activity {
             try {
                 HttpConnection http = new HttpConnection();
                 data = http.getCSV(url[0]);
+                Log.d("Data",http.readUrl(url[0]));
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
