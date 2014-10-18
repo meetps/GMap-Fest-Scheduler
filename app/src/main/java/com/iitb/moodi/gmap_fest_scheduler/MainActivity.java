@@ -9,10 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -28,7 +26,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new ReadTask().execute("http://auv-iitb.org/Web/fonts/mi_events.csv");
+        new ReadTask().execute("https://drive.google.com/uc?execute=download&id=0B_6rvZNWXShpV0t0ZWxlNkQ5UE0");
     }
 
     public void onClick(View v){
@@ -36,7 +34,7 @@ public class MainActivity extends Activity {
         String latlang=getLatLang(data.get(radioButtonID)[4]);
 
         Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("http://maps.google.com/maps?daddr="+latlang));
+                Uri.parse("http://maps.google.com/maps?daddr=" + latlang));
         startActivity(intent);
     }
 
@@ -74,11 +72,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            if(progress[0]%10!=0) return;
-
-            Toast t = new Toast(getApplicationContext());
-            t.setText("Downloaded "+ progress[0]+"%");
-            t.setDuration(Toast.LENGTH_SHORT);
+            Log.d("Download Debug", "progress:" + progress);
         }
 
         @Override
@@ -86,6 +80,7 @@ public class MainActivity extends Activity {
             super.onPostExecute(result);
             data=result;
             populateList();
+            Log.d("Download Debug", "finished executing");
         }
     }
 

@@ -1,5 +1,7 @@
 package com.iitb.moodi.gmap_fest_scheduler;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,10 +10,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import android.util.Log;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 public class HttpConnection {
 
@@ -22,6 +20,7 @@ public class HttpConnection {
         try {
             URL url = new URL(mapsApiDirectionsUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setInstanceFollowRedirects(true);
             urlConnection.connect();
             iStream = urlConnection.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(
@@ -50,18 +49,22 @@ public class HttpConnection {
         try {
             URL url = new URL(csvUrl);
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setInstanceFollowRedirects(true);
             urlConnection.connect();
+
+            Log.d("Download Debug","response: " + urlConnection.getResponseCode()+" -> "+urlConnection.getResponseMessage());
             iStream = urlConnection.getInputStream();
-            CSVReader csv = new CSVReader(new InputStreamReader(
+            BufferedReader br = new BufferedReader(new InputStreamReader(
                     iStream));
-
-            String[] next = {};
-
-            while ((next = csv.readNext()) != null) {
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                String[] next = line.split(",");
+                Log.i("Download Debug","row recieved : "+next[0]);
                 data.add(next);
             }
+            Log.i("Download Debug","data size : "+data.size());
         } catch (Exception e) {
-            Log.d("Exception while reading url", e.getMessage());
+            Log.d("Exception while reading url", e.toString());
         } finally {
             iStream.close();
             urlConnection.disconnect();
