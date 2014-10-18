@@ -17,6 +17,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends Activity {
@@ -32,6 +34,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        list = (RadioGroup) findViewById(R.id.event_list);
 
         // Acquire a reference to the system Location Manager
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -96,7 +100,7 @@ public class MainActivity extends Activity {
             try {
                 HttpConnection http = new HttpConnection();
                 data = http.getCSV(url[0]);
-                Log.d("Data",http.readUrl(url[0]));
+                //Log.d("Data",http.readUrl(url[0]));
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
@@ -112,16 +116,40 @@ public class MainActivity extends Activity {
         protected void onPostExecute(List<String[]> result) {
             super.onPostExecute(result);
             data=result;
-            populateList();
+            new Timer().scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    list.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            populateList();
+                        }
+                    });
+                }
+            }, 0, 5000);
             Log.d("Download Debug","finished executing");
         }
     }
 
     private void populateList(){
         list= (RadioGroup) findViewById(R.id.event_list);
+        list.removeAllViews();
+
+        int system_time=(int)(System.currentTimeMillis()%86400000)/1000+19800;
+        int time_range_start=system_time-60;
+        int time_range_end=system_time+60;
+
+        Log.d("Timer Debug", "sys time : "+system_time);
 
         for(int i=0; i<data.size(); i++){
             String[] event = data.get(i);
+            String[] hhmm=event[3].split(":");
+            int event_time = Integer.parseInt(hhmm[0])*3600+Integer.parseInt(hhmm[1])*60;
+
+            Log.d("Timer Debug","event time : "+event_time);
+
+            if(event_time<time_range_start || event_time>time_range_end) continue;
+
             RadioButton rb = new RadioButton(this);
 
             rb.setText(event[0]+" @ "+event[4]);
