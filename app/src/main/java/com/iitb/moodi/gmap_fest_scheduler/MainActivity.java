@@ -1,11 +1,8 @@
 package com.iitb.moodi.gmap_fest_scheduler;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,7 +10,6 @@ import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,69 +24,42 @@ public class MainActivity extends Activity {
     RadioGroup list;
     List<String[]> data;
 
-    LatLng myLocation;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         list = (RadioGroup) findViewById(R.id.event_list);
-
-        // Acquire a reference to the system Location Manager
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        Location myLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        myLocation = new LatLng(myLoc.getLatitude(),myLoc.getLongitude());
-
-// Define a listener that responds to location updates
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // Called when a new location is found by the network location provider.
-                myLocation=new LatLng(location.getLatitude(),location.getLongitude());
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
-
-            public void onProviderEnabled(String provider) {}
-
-            public void onProviderDisabled(String provider) {}
-        };
-
-// Register the listener with the Location Manager to receive location updates
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-
+        
         new ReadTask().execute("https://drive.google.com/uc?execute=download&id=0B_6rvZNWXShpV0t0ZWxlNkQ5UE0");
     }
 
     public void onClick(View v){
         int radioButtonID = list.getCheckedRadioButtonId();
-        LatLng destination=getLatLang(data.get(radioButtonID)[4]);
+        String latlang=getLatLang(data.get(radioButtonID)[4]);
 
-        Intent intent = new Intent();
-        intent.putExtra("destination",destination);
-        intent.putExtra("myLocation",myLocation);
-        intent.setClass(this, PathDisplayActivity.class);
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("http://maps.google.com/maps?daddr=" + latlang));
         startActivity(intent);
     }
 
-    private LatLng getLatLang(String place){
+    private String getLatLang(String place){
         if(place.equals("LCH"))
-            return new LatLng(19.130739,72.917208);
+            return "19.130739,72.917208";
         else if(place.equals("SAC"))
-            return new LatLng(19.135369,72.913769);
+            return "19.135369,72.913769";
         else if(place.equals("Footer Field"))
-            return new LatLng(19.134354,72.912133);
+            return "19.134354,72.912133";
         else if(place.equals("VMCC"))
-            return new LatLng(19.132506,72.917260);
+            return "19.132506,72.917260";
         else if(place.equals("FCK"))
-            return new LatLng(19.130484,72.915719);
+            return "19.130484,72.915719";
         else if(place.equals("H8 Road"))
-            return new LatLng(19.133731,72.911319);
+            return "19.133731,72.911319";
         else if(place.equals("KV Grounds"))
-            return new LatLng(19.129144,72.918190);
+            return "19.129144,72.918190";
         else
-            return new LatLng(19,72);
+            return "19,72";
     }
 
     private class ReadTask extends AsyncTask<String, Integer, List<String[]>> {
@@ -100,7 +69,6 @@ public class MainActivity extends Activity {
             try {
                 HttpConnection http = new HttpConnection();
                 data = http.getCSV(url[0]);
-                //Log.d("Data",http.readUrl(url[0]));
             } catch (Exception e) {
                 Log.d("Background Task", e.toString());
             }
@@ -109,7 +77,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            Log.d("Download Debug","progress:"+progress);
+            Log.d("Download Debug", "progress:" + progress);
         }
 
         @Override
